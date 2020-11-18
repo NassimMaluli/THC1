@@ -1,2 +1,4 @@
 this is also a sample or an example of a text file to be pushed to remote
-wanted to add changes
+wanted to add changes 
+these are changes to be observed in the Remote repo
+
