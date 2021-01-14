@@ -1,0 +1,58 @@
+	@Test(expected = WalletServiceException.class)
+	public void testExportEntry() {
+		String eVaultFileExp = "C:\\Users\\Nassim\\Desktop\\SWT20_Arar_Lugji_Maluli\\code\\evault-project\\wallet\\src\\test\\resources\\test.dat";
+		File f=null;
+		try {
+
+			// liste in model leeren
+			model.getItemsFlatList().clear();
+
+			// liste in model mit den Test Daten befüllen
+			model.setupTestData();
+
+			model.setVaultFileName("test_vault_001.dat");
+			ServiceRegistry.instance.getWalletForm().setModel(model);
+			PassCombinationVO passVO = new PassCombinationEncryptionAdaptor("testPa!ss213%", "112233") ;
+			String hash = HashingUtils.createHash(passVO.getPass());
+			String combinationHash = HashingUtils.createHash(passVO.getCombination());
+			model.setHash(hash, combinationHash);
+			model.initEncryptor(passVO);
+
+			PassCombinationVO passVO2 = new PassCombinationEncryptionAdaptor("testPa!ss213%_new","030405") ;
+			WalletModel expModel = new WalletModel();
+			expModel.initEncryptor(passVO2);
+
+			f = new File(eVaultFileExp);
+			f.delete();
+
+			// export model.getItemsFlatList().get(1) = "Bank Info" in model
+			walletService.exportItem(model.getItemsFlatList().get(1), passVO2, eVaultFileExp );
+
+			String hash2 = HashingUtils.createHash(passVO2.getPass());
+			String combinationHash2 = HashingUtils.createHash(passVO2.getCombination());
+			expModel.setHash(hash2, combinationHash2);
+
+			StoreVO fc  = walletService.loadVault(eVaultFileExp, expModel.getEncryptor() );
+
+			model.getItemsFlatList().clear();
+			model.setItemsFlatList(fc.getWalletItems());
+			model.buildTreeFromFlatList();
+
+			// Anzahl der Elemente untersuchen
+			assertEquals(4, fc.getWalletItems().size());
+			// Schritte in Aufgabe 2b
+			assertEquals(fc.getWalletItems().get(1), model.getItemsFlatList().get(1));
+			assertEquals(fc.getWalletItems().get(2), model.getItemsFlatList().get(2));
+			assertEquals(fc.getWalletItems().get(3), model.getItemsFlatList().get(3));
+			assertEquals(fc.getWalletItems().get(2).getParent(), model.getItemsFlatList().get(1));
+			assertEquals(fc.getWalletItems().get(3).getParent(), model.getItemsFlatList().get(1));
+
+		} catch (HashingUtils.CannotPerformOperationException | WalletServiceException e) {
+			e.printStackTrace();
+		}
+		finally {
+			if (f!=null)
+				f.delete();
+		}
+
+	}

@@ -1,0 +1,26 @@
+public void testAddItemToItem(){
+   WalletItem walletItem = new WalletItem();
+   walletItem.setType(ItemType.item);
+   WalletItem walletItem1 = new WalletItem();
+   assertThrows(RuntimeException.class, () -> walletItem.addChild(walletItem1));
+}
+
+@Test
+public void testAddItemToEmptyCategory(){
+   WalletItem walletItem = new WalletItem();
+   walletItem.setType(ItemType.category);
+   WalletItem walletItem1 = new WalletItem();
+   walletItem.addChild(walletItem1);
+   assertTrue(walletItem.getChildren().contains(walletItem1));
+}
+
+@Test
+public void testAddItemToCategoryWithChildList (){
+   WalletItem walletItem = new WalletItem();
+   walletItem.setType(ItemType.category);
+   ArrayList<WalletItem> children = new ArrayList<>();
+   walletItem.setChildren(children);
+   WalletItem walletItem1 = new WalletItem();
+   walletItem.addChild(walletItem1);
+   assertTrue(walletItem.getChildren().contains(walletItem1));
+}
